@@ -1,0 +1,34 @@
+# DHCP Server Configuration
+
+default-lease-time 600;
+max-lease-time 7200;
+option domain-name "{{ domain_name }}";
+option domain-name-servers {{ dns_servers | join(', ') }};
+option routers {{ option_router }};
+
+subnet {{ subnet }} netmask {{ netmask }} {
+    range {{ range_start }} {{ range_end }};
+    option routers {{ option_router }};
+}
+
+# Failover peer configuration
+failover peer "dhcp-failover" {
+    {% if inventory_hostname == dhcp_primary_ip %}
+    primary;
+    address {{ dhcp_primary_ip }};
+    port 519;
+    peer address {{ dhcp_secondary_ip }};
+    peer port 520;
+    mclt 3600;
+    split 128;
+    {% else %}
+    secondary;
+    address {{ dhcp_secondary_ip }};
+    port 520;
+    peer address {{ dhcp_primary_ip }};
+    peer port 519;
+    {% endif %}
+    max-response-delay 60;
+    max-unacked-updates 10;
+    load balance max seconds 3;
+}
