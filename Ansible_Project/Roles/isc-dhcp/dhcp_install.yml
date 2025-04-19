@@ -1,6 +1,6 @@
 ---
 - name: Configure ISC-DHCP-SERVER with failover
-  hosts: dhcp_servers
+  hosts: myhosts
   become: yes
   vars:
     dhcp_primary_ip: "10.175.151.2"
