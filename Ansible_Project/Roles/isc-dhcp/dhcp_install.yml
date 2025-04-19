@@ -1,0 +1,39 @@
+---
+- name: Configure ISC-DHCP-SERVER with failover
+  hosts: dhcp_servers
+  become: yes
+  vars:
+    dhcp_primary_ip: "10.175.151.2"
+    dhcp_secondary_ip: "10.175.151.3"
+    subnet: "10.175.151.0"
+    netmask: "255.255.255.192"
+    range_start: "10.175.151.10"
+    range_end: "10.175.151.50"
+    option_router: "10.175.151.1"
+    dns_servers: ["10.131.20.2", "10.131.20.3"]
+    domain_name: "rjdcit449.com"
+    interface: "eth0"
+
+  tasks:
+    - name: Install ISC-DHCP-SERVER
+      apt:
+        name: isc-dhcp-server
+        state: present
+    - name: Configure DHCP server
+      template:
+        src: dhcpd.conf.j2
+        dest: /etc/dhcp/dhcpd.conf
+      notify: Restart DHCP server
+
+    - name: Configure DHCP server interface
+      lineinfile:
+        path: /etc/default/isc-dhcp-server
+        regexp: '^INTERFACESv4='
+        line: "INTERFACESv4=\"{{ interface }}\""
+      notify: Restart DHCP server
+
+  handlers:
+    - name: Restart DHCP server
+      service:
+        name: isc-dhcp-server
+        state: restarted
