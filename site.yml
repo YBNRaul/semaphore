@@ -1,7 +1,11 @@
 ---
-- hosts: = myhosts  
+- name: Configure Ubuntu Services
+  hosts: kea_dns_samba_postfix
   become: true
-  tasks:
-    - name: Print OS info
-      ansible.builtin.package:
-        name: apache2
+  roles:
+    - kea
+    - bind
+    - samba
+    - postfix
+    - bacula
+    - tftp
