@@ -12,7 +12,7 @@
     option_router: "10.175.151.1"
     dns_servers: ["10.131.20.2", "10.131.20.3"]
     domain_name: "rjdcit449.com"
-    interface: "eth0"
+    interface: "ens33"
 
   tasks:
     - name: Install ISC-DHCP-SERVER
