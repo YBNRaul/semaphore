@@ -1,0 +1,25 @@
+- name: Install Bacula packages
+  apt:
+    name:
+      - bacula-server
+      - bacula-client
+    state: present
+
+- name: Copy Bacula config files
+  copy:
+    src: files/{{ item }}
+    dest: /etc/bacula/{{ item }}
+  with_items:
+    - bacula-dir.conf
+    - bacula-sd.conf
+    - bacula-fd.conf
+
+- name: Restart Bacula services
+  service:
+    name: "{{ item }}"
+    state: restarted
+    enabled: true
+  loop:
+    - bacula-director
+    - bacula-sd
+    - bacula-fd
