@@ -1,0 +1,28 @@
+- name: Install BIND DNS
+  apt:
+    name: isc-bind
+    state: present
+
+- name: Configure named.conf.options
+  copy:
+    dest: /etc/bind/named.conf.options
+    content: "{{ lookup('file', 'files/named.conf.options') }}"
+
+- name: Configure named.conf.local
+  copy:
+    dest: /etc/bind/named.conf.local
+    content: "{{ lookup('file', 'files/named.conf.local') }}"
+
+- name: Create zone files
+  copy:
+    src: "files/{{ item }}"
+    dest: "/etc/bind/{{ item }}"
+  with_items:
+    - db.rjdcit449.local
+    - db.10
+
+- name: Restart BIND
+  service:
+    name: bind9
+    state: restarted
+    enabled: true
