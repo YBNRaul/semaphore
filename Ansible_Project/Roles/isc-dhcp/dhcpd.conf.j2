@@ -17,7 +17,7 @@ subnet {{ subnet }} netmask {{ netmask }} {
 # Failover peer configuration
 failover peer "dhcp-failover" {
     {% if inventory_hostname == dhcp_primary_ip %}
-    primary;
+primary;
     address {{ dhcp_primary_ip }};
     port 519;
     peer address {{ dhcp_secondary_ip }};
@@ -25,13 +25,13 @@ failover peer "dhcp-failover" {
     mclt 3600;
     split 128;
     {% else %}
-    secondary;
+secondary;
     address {{ dhcp_secondary_ip }};
     port 520;
     peer address {{ dhcp_primary_ip }};
     peer port 519;
     {% endif %}
-    max-response-delay 60;
+max-response-delay 60;
     max-unacked-updates 10;
     load balance max seconds 3;
     }
