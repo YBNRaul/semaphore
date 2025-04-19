@@ -1,0 +1,12 @@
+$TTL    604800
+@       IN      SOA     ns1.{{ forward_zone }}. admin.{{ forward_zone }}. (
+                              {{ ansible_date_time.date | replace('-', '') }}01 ; Serial
+                              604800             ; Refresh
+                              86400              ; Retry
+                              2419200            ; Expire
+                              604800 )           ; Negative Cache TTL
+;
+@       IN      NS      ns1.{{ forward_zone }}.
+@       IN      NS      ns2.{{ forward_zone }}.
+ns1     IN      A       {{ primary_server }}
+ns2     IN      A       {{ secondary_server }}
