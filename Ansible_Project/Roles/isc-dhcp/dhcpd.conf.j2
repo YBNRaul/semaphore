@@ -6,14 +6,6 @@ option domain-name "{{ domain_name }}";
 option domain-name-servers {{ dns_servers | join(', ') }};
 option routers {{ option_router }};
 
-subnet {{ subnet }} netmask {{ netmask }} {
-    option routers {{ option_router }};
-    pool{
-        failover peer "dhcp-failover";
-        range {{ range_start }} {{ range_end }};
-    }
-}
-
 # Failover peer configuration
 failover peer "dhcp-failover" {
     {% if inventory_hostname == dhcp_primary_ip %}
@@ -34,4 +26,12 @@ secondary;
 max-response-delay 60;
     max-unacked-updates 10;
     load balance max seconds 3;
+}
+
+subnet {{ subnet }} netmask {{ netmask }} {
+    option routers {{ option_router }};
+    pool{
+        failover peer "dhcp-failover";
+        range {{ range_start }} {{ range_end }};
     }
+}
