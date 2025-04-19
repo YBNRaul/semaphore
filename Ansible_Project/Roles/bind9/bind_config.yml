@@ -1,0 +1,57 @@
+---
+- name: Configure BIND 9 on both servers
+  hosts: all
+  become: yes
+  vars:
+    forwarders:
+      - 10.121.20.2
+      - 10.121.20.3
+    primary_server: 10.175.151.2
+    secondary_server: 10.175.151.3
+    forward_zone: rjdcit449.com
+    reverse_zone: 151.175.10.in-addr.arpa
+    forward_zone_file: /etc/bind/db.rjdcit449.com
+    reverse_zone_file: /etc/bind/db.10
+
+  tasks:
+    - name: Install BIND 9
+      apt:
+        name: bind9
+        state: present
+
+    - name: Configure named.conf.local
+      template:
+        src: named.conf.local.j2
+        dest: /etc/bind/named.conf.local
+
+    - name: Configure named.conf.options
+      template:
+        src: named.conf.options.j2
+        dest: /etc/bind/named.conf.options
+
+    - name: Create forward zone file on primary server
+      template:
+        src: db.rjdcit449.com.j2
+        dest: "{{ forward_zone_file }}"
+      when: ansible_host == primary_server
+
+    - name: Create reverse zone file on primary server
+      template:
+        src: db.10.j2
+        dest: "{{ reverse_zone_file }}"
+      when: ansible_host == primary_server
+
+    - name: Increment serial number in forward zone file
+      command: >
+        sed -i 's/\([0-9]\{10\}\)/\1 + 1/e' {{ forward_zone_file }}
+      when: ansible_host == primary_server
+
+    - name: Increment serial number in reverse zone file
+      command: >
+        sed -i 's/\([0-9]\{10\}\)/\1 + 1/e' {{ reverse_zone_file }}
+      when: ansible_host == primary_server
+
+    - name: Restart BIND 9
+      service:
+        name: bind9
+        state: restarted
