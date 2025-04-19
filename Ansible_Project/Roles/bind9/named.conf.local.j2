@@ -1,0 +1,19 @@
+zone "{{ forward_zone }}" {
+    type {{ ansible_host == primary_server | ternary('master', 'slave') }};
+    file "{{ forward_zone_file }}";
+    {% if ansible_host == primary_server %}
+    allow-transfer { {{ secondary_server }}; };
+    {% else %}
+    masters { {{ primary_server }}; };
+    {% endif %}
+};
+
+zone "{{ reverse_zone }}" {
+    type {{ ansible_host == primary_server | ternary('master', 'slave') }};
+    file "{{ reverse_zone_file }}";
+    {% if ansible_host == primary_server %}
+    allow-transfer { {{ secondary_server }}; };
+    {% else %}
+    masters { {{ primary_server }}; };
+    {% endif %}
+};
