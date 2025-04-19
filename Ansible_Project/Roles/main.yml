@@ -1,0 +1,16 @@
+- name: Install Kea DHCP server
+  apt:
+    name: kea-dhcp4-server
+    state: present
+    update_cache: true
+
+- name: Deploy Kea configuration
+  copy:
+    dest: /etc/kea/kea-dhcp4.conf
+    content: "{{ lookup('file', 'files/kea-dhcp4.conf') }}"
+
+- name: Restart Kea DHCP
+  service:
+    name: kea-dhcp4-server
+    state: restarted
+    enabled: true
