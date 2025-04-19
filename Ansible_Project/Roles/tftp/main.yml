@@ -1,0 +1,19 @@
+- name: Install TFTP server
+  apt:
+    name: tftpd-hpa
+    state: present
+
+- name: Configure TFTP
+  copy:
+    dest: /etc/default/tftpd-hpa
+    content: |
+      TFTP_USERNAME="tftp"
+      TFTP_DIRECTORY="/var/lib/tftpboot"
+      TFTP_ADDRESS="0.0.0.0:69"
+      TFTP_OPTIONS="--secure"
+
+- name: Restart TFTP
+  service:
+    name: tftpd-hpa
+    state: restarted
+    enabled: true
