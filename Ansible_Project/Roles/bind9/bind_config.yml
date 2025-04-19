@@ -41,16 +41,6 @@
         dest: "{{ reverse_zone_file }}"
       when: ansible_host == primary_server
 
-    - name: Increment serial number in forward zone file
-      command: >
-        sed -i 's/\([0-9]\{10\}\)/\1 + 1/e' {{ forward_zone_file }}
-      when: ansible_host == primary_server
-
-    - name: Increment serial number in reverse zone file
-      command: >
-        sed -i 's/\([0-9]\{10\}\)/\1 + 1/e' {{ reverse_zone_file }}
-      when: ansible_host == primary_server
-
     - name: Restart BIND 9
       service:
         name: bind9
