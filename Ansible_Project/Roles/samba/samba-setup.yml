@@ -1,6 +1,6 @@
 ---
 - name: Install and configure Samba
-  hosts: samba
+  hosts: myhosts
   become: true
 
   vars:
