@@ -7,14 +7,24 @@
     samba_share_name: "shared"
     samba_share_path: "/srv/samba/shared"
     samba_user: "ryley"
-    samba_password: "wlvreen7"  # Store securely in real setups
+    samba_password: "wlvreen7"  # Consider encrypting with ansible-vault
 
   tasks:
-    - name: Install Samba packages
+    - name: Install Samba and required packages
       apt:
-        name: samba
+        name:
+          - samba
+          - samba-common
+          - samba-common-bin
+          - smbclient
         state: present
         update_cache: true
+
+    - name: Ensure smbd is enabled and started
+      service:
+        name: smbd
+        state: started
+        enabled: true
 
     - name: Create Samba share directory
       file:
