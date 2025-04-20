@@ -7,7 +7,7 @@
     samba_share_name: "shared"
     samba_share_path: "/srv/samba/shared"
     samba_user: "ryley"
-    samba_password: "wlvreen7"  # Store securely in real setups
+    samba_password: "Wlvreen7!"  # Store securely in real setups
 
   tasks:
     - name: Install Samba packages
