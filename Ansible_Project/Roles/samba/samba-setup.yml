@@ -29,7 +29,6 @@
     - name: Configure Samba public share
       blockinfile:
         path: /etc/samba/smb.conf
-        marker: "; ANSIBLE MANAGED BLOCK {{ marker }}"
         block: |
           [{{ samba_share_name }}]
           path = {{ samba_share_path }}
