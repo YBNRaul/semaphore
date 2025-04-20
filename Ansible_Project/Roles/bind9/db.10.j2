@@ -1,12 +1,11 @@
 $TTL    604800
-@       IN      SOA     {{ forward_zone }}. admin.{{ forward_zone }}. (
+@       IN      SOA     ns.{{ forward_zone }}. root.{{ forward_zone }}. (
                               2                  ; Serial
                               604800             ; Refresh
                               86400              ; Retry
                               2419200            ; Expire
                               604800 )           ; Negative Cache TTL
 ;
-@       IN      NS      ns1.{{ forward_zone }}.
-@       IN      NS      ns2.{{ forward_zone }}.
-2       IN      PTR     ns1.{{ forward_zone }}.
-3       IN      PTR     ns2.{{ forward_zone }}.
+@       IN      NS      ns
+2       IN      PTR     ns.{{ forward_zone }}.
+3       IN      PTR     ns.{{ forward_zone }}.
