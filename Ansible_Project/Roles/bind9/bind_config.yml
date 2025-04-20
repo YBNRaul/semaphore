@@ -41,8 +41,21 @@
         dest: "{{ reverse_zone_file }}"
       when: ansible_host == primary_server
 
+    - name: Increment serial number in forward zone file
+      replace:
+        path: "{{ forward_zone_file }}"
+        regexp: '(\d{10})'
+        replace: '\1 + 1'
+      when: ansible_host == primary_server
+
+    - name: Increment serial number in reverse zone file
+      replace:
+        path: "{{ reverse_zone_file }}"
+        regexp: '(\d{10})'
+        replace: '\1 + 1'
+      when: ansible_host == primary_server
+
     - name: Restart BIND 9
       service:
         name: bind9
         state: restarted
-
