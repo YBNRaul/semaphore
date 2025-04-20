@@ -1,52 +1,46 @@
 ---
-- name: Install and configure Samba
+- name: Install and configure public Samba share
   hosts: myhosts
   become: true
 
   vars:
     samba_share_name: "shared"
     samba_share_path: "/srv/samba/shared"
-    samba_user: "ryley"
-    samba_password: "Wlvreen7!"  # Store securely in real setups
 
   tasks:
-    - name: Install Samba packages
+    - name: Install Samba and required packages
       apt:
-        name: samba
+        name:
+          - samba
+          - samba-common
+          - samba-common-bin
+          - smbclient
         state: present
         update_cache: true
 
-    - name: Create Samba share directory
+    - name: Create public Samba share directory
       file:
         path: "{{ samba_share_path }}"
         state: directory
-        mode: '0775'
-        owner: "{{ samba_user }}"
-        group: "{{ samba_user }}"
+        mode: '0777'
+        owner: nobody
+        group: nogroup
 
-    - name: Create Samba user
-      user:
-        name: "{{ samba_user }}"
-        shell: /sbin/nologin
-        create_home: no
-
-    - name: Set Samba password for user
-      command: echo -ne "{{ samba_password }}\n{{ samba_password }}\n" | smbpasswd -a -s {{ samba_user }}
-      args:
-        creates: "/var/lib/samba/private/{{ samba_user }}.tdb"
-
-    - name: Configure Samba share
+    - name: Configure Samba public share
       blockinfile:
         path: /etc/samba/smb.conf
+        marker: "; ANSIBLE MANAGED BLOCK {{ marker }}"
         block: |
           [{{ samba_share_name }}]
           path = {{ samba_share_path }}
-          valid users = {{ samba_user }}
-          read only = no
           browsable = yes
-          guest ok = no
+          writable = yes
+          guest ok = yes
+          guest only = yes
+          read only = no
+          force user = nobody
 
-    - name: Restart Samba services
+    - name: Restart smbd service
       service:
         name: smbd
         state: restarted
