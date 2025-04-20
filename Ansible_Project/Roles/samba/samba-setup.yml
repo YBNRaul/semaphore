@@ -1,0 +1,53 @@
+---
+- name: Install and configure Samba
+  hosts: samba
+  become: true
+
+  vars:
+    samba_share_name: "shared"
+    samba_share_path: "/srv/samba/shared"
+    samba_user: "ryley"
+    samba_password: "wlvreen7"  # Store securely in real setups
+
+  tasks:
+    - name: Install Samba packages
+      apt:
+        name: samba
+        state: present
+        update_cache: true
+
+    - name: Create Samba share directory
+      file:
+        path: "{{ samba_share_path }}"
+        state: directory
+        mode: '0775'
+        owner: "{{ samba_user }}"
+        group: "{{ samba_user }}"
+
+    - name: Create Samba user
+      user:
+        name: "{{ samba_user }}"
+        shell: /sbin/nologin
+        create_home: no
+
+    - name: Set Samba password for user
+      command: echo -ne "{{ samba_password }}\n{{ samba_password }}\n" | smbpasswd -a -s {{ samba_user }}
+      args:
+        creates: "/var/lib/samba/private/{{ samba_user }}.tdb"
+
+    - name: Configure Samba share
+      blockinfile:
+        path: /etc/samba/smb.conf
+        block: |
+          [{{ samba_share_name }}]
+          path = {{ samba_share_path }}
+          valid users = {{ samba_user }}
+          read only = no
+          browsable = yes
+          guest ok = no
+
+    - name: Restart Samba services
+      service:
+        name: smbd
+        state: restarted
+        enabled: true
