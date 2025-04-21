@@ -2,5 +2,48 @@
 - name: Configure local Postfix for Windows messaging
   hosts: myhosts
   become: yes
-  roles:
-    - postfix_localmail
+
+  tasks:
+  - name: Install Postfix
+    apt:
+      name: postfix
+      state: present
+      update_cache: yes
+  
+  - name: Configure Postfix main.cf
+    template:
+      src: main.cf.j2
+      dest: /etc/postfix/main.cf
+      owner: root
+      group: root
+      mode: '0644'
+
+  - name: Ensure maildir is used for local delivery
+    lineinfile:
+      path: /etc/postfix/main.cf
+      line: "home_mailbox = Maildir/"
+
+  - name: Create local users for mailboxes
+    user:
+      name: "{{ item }}"
+      shell: /usr/sbin/nologin
+      create_home: yes
+    with_items:
+      - pc1
+      - pc2
+
+  - name: Ensure Maildir exists for each user
+    file:
+      path: "/home/{{ item }}/Maildir"
+      state: directory
+      owner: "{{ item }}"
+      group: "{{ item }}"
+      mode: '0700'
+    with_items:
+      - pc1
+      - pc2
+
+  - name: Restart Postfix
+    service:
+      name: postfix
+      state: restarted
