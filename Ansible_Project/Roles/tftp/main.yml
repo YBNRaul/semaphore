@@ -21,8 +21,8 @@
     mode: '0644'
   notify: Restart tftpd-hpa
 
-- name: Ensure tftpd-hpa is enabled and started
+- name: Restart tftpd-hpa
   systemd:
     name: tftpd-hpa
-    enabled: yes
-    state: started
+    state: restarted
+    daemon_reload: yes
