@@ -1,0 +1,6 @@
+---
+- name: Setup TFTP Server
+  hosts: myhosts
+  become: yes
+  roles:
+    - tftp
