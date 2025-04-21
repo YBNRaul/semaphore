@@ -1,6 +1,6 @@
 ---
 - name: Configure local Postfix for Windows messaging
-  hosts: postfix
+  hosts: myhosts
   become: yes
   roles:
     - postfix_localmail
