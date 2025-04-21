@@ -2,5 +2,32 @@
 - name: Setup TFTP Server
   hosts: myhosts
   become: yes
-  roles:
-    - tftp
+  
+- name: Install tftpd-hpa package
+  apt:
+    name: tftpd-hpa
+    state: present
+    update_cache: yes
+
+- name: Create TFTP root directory
+  file:
+    path: /var/lib/tftpboot
+    state: directory
+    owner: tftp
+    group: tftp
+    mode: '0755'
+
+- name: Deploy tftpd-hpa config
+  template:
+    src: tftpd-hpa.j2
+    dest: /etc/default/tftpd-hpa
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart tftpd-hpa
+
+- name: Restart tftpd-hpa
+  systemd:
+    name: tftpd-hpa
+    state: restarted
+    daemon_reload: yes
